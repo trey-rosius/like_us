@@ -1,0 +1,81 @@
+type Comment @model @auth(rules: [{allow: public}]) @key(name: "byUser", fields: ["userID"]) @key(name: "byPost", fields: ["postID"]) {
+  id: ID!
+  commentText: String!
+  createdOn: AWSDateTime
+  updatedOn: AWSDateTime
+  userID: ID
+  postID: ID
+}
+
+enum ChatItemTyp {
+  TEXT
+  IMAGE
+}
+
+type ChatItem @model @auth(rules: [{allow: public}]) @key(name: "byChat", fields: ["chatID"]) {
+  id: ID!
+  senderId: String!
+  receiverId: String!
+  message: String
+  imageUrl: String
+  chatItemType: ChatItemTyp!
+  chatID: ID!
+  createdOn: AWSTimestamp
+}
+
+type Chat @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  lastMessage: String!
+  receiverId: String!
+  senderId: String!
+  createdOn: AWSDateTime
+  updatedOn: AWSDateTime
+  ChatItems: [ChatItem] @connection(keyName: "byChat", fields: ["id"])
+  users: [UserChat] @connection(keyName: "byChat", fields: ["id"])
+}
+
+enum PostStatus {
+  CREATED
+  UPDATED
+  DELETED
+}
+
+enum PostTyp {
+  TEXT
+  IMAGE
+}
+
+type Post @model @auth(rules: [{allow: public}]) @key(name: "byUser", fields: ["userID"]) {
+  id: ID!
+  content: String!
+  postImageUrl: String
+  postType: PostTyp!
+  postStatus: PostStatus
+  userID: ID
+  createdOn: AWSDateTime
+  updatedOn: AWSDateTime
+  Comments: [Comment] @connection(keyName: "byPost", fields: ["id"])
+}
+
+type User @model @auth(rules: [{allow: public}]) {
+  id: ID!
+  username: String!
+  firstName: String
+  lastName: String
+  isVerified:Boolean!
+  profilePicUrl: String
+  email: String!
+  Posts: [Post] @connection(keyName: "byUser", fields: ["id"])
+  UserChats: [UserChat] @connection(keyName: "byUser", fields: ["id"])
+  createdOn: AWSDateTime
+  updatedOn: AWSDateTime
+  Comments: [Comment] @connection(keyName: "byUser", fields: ["id"])
+}
+
+type UserChat @model(queries: null) @key(name: "byUser", fields: ["userID", "chatID"]) @key(name: "byChat", fields: ["chatID", "userID"]) @auth(rules: [{allow: public}, {allow: public}]) {
+  id: ID!
+  userID: ID!
+  chatID: ID!
+  user: User! @connection(fields: ["userID"])
+  chat: Chat! @connection(fields: ["chatID"])
+}

@@ -1,11 +1,40 @@
+
+
+import 'package:amplify_datastore/amplify_datastore.dart';
+import 'package:amplify_flutter/amplify.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:like_us/utils/amplify_services.dart';
+
+import 'models/ModelProvider.dart';
+import 'models/Post.dart';
 
 void main() {
+
+  SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.black,
+    statusBarColor: Colors.black,
+  ));
+
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   // This widget is the root of your application.
+  @override
+  _MyAppState createState() => _MyAppState();
+}
+
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    AmplifyService.configureAmplify();
+  }
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -48,15 +77,36 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
-  void _incrementCounter() {
-    setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+  List<Post> posts;
+  final Post item = Post(
+    id: "a3f4095e-39de-43d2-baf4-f8c16f0f6f54",
+      content: "save more data",
+      postImageUrl: "Lorem ipsum dolor sit amet",
+      postType: PostTyp.TEXT,
+      postStatus: PostStatus.CREATED,
+      userID: "a3f4095e-39de-43d2-baf4-f8c16f0f6f4d",
+      createdOn: TemporalDateTime.now(),
+        );
+  void insertData(Post item) async{
+    print("post item");
+    await Amplify.DataStore.save(item);
+  }
+getAllPosts() async{
+  try {
+    await Amplify.DataStore.query(Post.classType).then((value) {
+      print(value[0]);
     });
+
+
+  } catch (e) {
+    print(e);
+  }
+}
+@override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    getAllPosts();
   }
 
   @override
@@ -104,7 +154,7 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: ()=>insertData(item),
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
