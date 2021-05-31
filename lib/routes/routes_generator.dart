@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:like_us/routes/routes_path.dart';
+import 'package:like_us/screens/LoginScreen/login_screen.dart';
+import 'package:like_us/screens/OtpScreen/otp_screen.dart';
+import 'package:like_us/screens/RegisterScreen/register_screen.dart';
+import 'package:like_us/screens/SplashScreen/splash_screen.dart';
+import 'package:like_us/screens/home_screen.dart';
+import 'package:like_us/wrapper.dart';
+
+
 
 
 Route<dynamic> generateRoute(RouteSettings settings) {
